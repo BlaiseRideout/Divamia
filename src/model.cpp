@@ -176,8 +176,8 @@ void Model::loadModel(std::string filename, GLuint positionAttribute, GLuint nor
 	uvs.loadData(temp_uvs);
 	this->indices.loadData(temp_indices);
 
-	this->vao.setAttrib(positionAttribute, positions, 3, GL_FLOAT);
-	this->vao.setAttrib(normalAttribute, normals, 3, GL_FLOAT);
+	this->vao.setAttrib(positionAttribute, positions, 3, GL_FLOAT, false);
+	this->vao.setAttrib(normalAttribute, normals, 3, GL_FLOAT, false);
 	this->vao.setAttrib(uvAttribute, uvs, 2, GL_FLOAT, true);
 }
 

@@ -9,14 +9,15 @@
 class Game {
     public:
         Game();
+		Game(std::string title, int majorVersion, int minorVersion);
         virtual ~Game();
         void run();
     protected:
-        virtual void update() = 0;
-        virtual void draw() = 0;
+        virtual void update(double time) = 0;
 
         bool running;
         Window window;
+		double time;
 };
 
 #endif

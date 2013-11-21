@@ -31,7 +31,7 @@ void VAO::setAttrib(ShaderProgram &s, std::string name, Buffer const &b, int siz
 }
 
 void VAO::setAttrib(ShaderProgram &s, std::string name, Buffer const &b, int size, GLenum type, bool normalized) {
-	setAttrib(s.getAttribLocation(name), b, size, type, normalized, 0);
+	setAttrib(s, name, b, size, type, normalized, 0);
 }
 
 void VAO::setAttrib(ShaderProgram &s, std::string name, Buffer const &b, int size, bool normalized) {
@@ -48,7 +48,7 @@ void VAO::setAttrib(ShaderProgram &&s, std::string name, Buffer const &b, int si
 }
 
 void VAO::setAttrib(ShaderProgram &&s, std::string name, Buffer const &b, int size, GLenum type, bool normalized) {
-	setAttrib(s.getAttribLocation(name), b, size, type, normalized, 0);
+	setAttrib(s, name, b, size, type, normalized, 0);
 }
 
 void VAO::setAttrib(ShaderProgram &&s, std::string name, Buffer const &b, int size, bool normalized) {
