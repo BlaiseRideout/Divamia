@@ -2,11 +2,11 @@
 #include <iostream>
 #include <glm/glm.hpp>
 
-#include "demo.hpp"
+#include "tessdemo.hpp"
 
 int main(int argc, char **argv) {
   try {
-    Demo game;
+    TessDemo game;
     game.run();
     return 0;
   }
