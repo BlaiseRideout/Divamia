@@ -341,6 +341,13 @@ Uniform &Uniform::operator=(glm::vec2 const &val) {
     return *this;
 }
 
+Uniform &Uniform::operator=(glm::mat3 const &val) {
+	glUseProgram(this->program);
+	glUniformMatrix3fv(this->id, 1, GL_FALSE, &val[0][0]);
+	glUseProgram(ShaderProgram::currentProgram);
+	return *this;
+}
+
 Uniform &Uniform::operator=(glm::mat4 const &val) {
     glUseProgram(this->program);
     glUniformMatrix4fv(this->id, 1, GL_FALSE, &val[0][0]);
