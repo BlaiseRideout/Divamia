@@ -11,10 +11,6 @@
 
 #include "texture.hpp"
 
-class Shader;
-class VertexShader;
-class FragmentShader;
-class ShaderProgram;
 
 class Shader {
 	public:
@@ -77,6 +73,7 @@ class Uniform {
 		Uniform &operator=(glm::vec4 const &val);
 		Uniform &operator=(glm::vec3 const &val);
 		Uniform &operator=(glm::vec2 const &val);
+		Uniform &operator=(glm::mat3 const &val);
 		Uniform &operator=(glm::mat4 const &val);
 		Uniform &operator=(Texture const &val);
 
@@ -106,6 +103,7 @@ class ShaderProgram {
 		void setUniform(std::string const &name, glm::vec4 const &value);
 		void setUniform(std::string const &name, glm::vec3 const &value);
 		void setUniform(std::string const &name, glm::vec2 const &value);
+		void setUniform(std::string const &name, glm::mat3 const &value);
 		void setUniform(std::string const &name, glm::mat4 const &value);
 		void setUniform(std::string const &name, Texture const &value);
 

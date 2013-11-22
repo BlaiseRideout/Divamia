@@ -201,6 +201,12 @@ void ShaderProgram::setUniform(std::string const &name, glm::vec2 const &value) 
     glUseProgram(ShaderProgram::currentProgram);
 }
 
+void ShaderProgram::setUniform(std::string const &name, glm::mat3 const &value) {
+    glUseProgram(this->id);
+    glUniformMatrix3fv(this->getUniformLocation(name), 1, GL_FALSE, &value[0][0]);
+    glUseProgram(ShaderProgram::currentProgram);
+}
+
 void ShaderProgram::setUniform(std::string const &name, glm::mat4 const &value) {
     glUseProgram(this->id);
     glUniformMatrix4fv(this->getUniformLocation(name), 1, GL_FALSE, &value[0][0]);
@@ -337,6 +343,13 @@ Uniform &Uniform::operator=(glm::vec3 const &val) {
 Uniform &Uniform::operator=(glm::vec2 const &val) {
     glUseProgram(this->program);
     glUniform2f(this->id, val.x, val.y);
+    glUseProgram(ShaderProgram::currentProgram);
+    return *this;
+}
+
+Uniform &Uniform::operator=(glm::mat3 const &val) {
+    glUseProgram(this->program);
+    glUniformMatrix3fv(this->id, 1, GL_FALSE, &val[0][0]);
     glUseProgram(ShaderProgram::currentProgram);
     return *this;
 }
