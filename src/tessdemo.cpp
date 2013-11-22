@@ -3,7 +3,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 
-TessDemo::TessDemo() : Game("Tesselation Demo", 4, 2) {
+TessDemo::TessDemo() : Game("Tesselation Demo", 4, 0) {
 	initShader();
 	initBuffers();
 }
@@ -18,28 +18,20 @@ void TessDemo::initShader() {
 	this->p = ShaderProgram(v, tc, te, g, f);
 
 	glm::mat4 M = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f));
-	glm::mat4 V = glm::lookAt(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0, 1, 0));
+	glm::mat4 V = glm::lookAt(glm::vec3(0.0f, 0.0f, -10.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0, 1, 0));
 
 	this->p["M"] = M;
 	this->p["V"] = V;
-	this->p["P"] = glm::perspective(45.0f, (float)this->window.width / (float)this->window.height, 0.1f, 10.0f);
+	this->p["P"] = glm::perspective(45.0f, (float)this->window.width / (float)this->window.height, -0.1f, 100.0f);
 	//this->p["P"] = glm::mat4(1.0f);
-	//this->p["NormalMatrix"] = glm::mat3(glm::transpose(glm::inverse(V * M)));
+	this->p["NormalMatrix"] = glm::mat3(glm::transpose(glm::inverse(V * M)));
 
-	//this->p["LightPosition"] = glm::vec4(-0.5f, 1.0f, 1.0f, 0.0f);
-	//this->p["DiffuseMaterial"] = glm::vec3(0.7f, 0.7f, 1.0f);
-	//this->p["AmbientMaterial"] = glm::vec3(0.2f, 0.2f, 0.2f);
+	this->p["LightPosition"] = glm::vec4(-0.5f, 1.0f, 1.0f, 0.0f);
+	this->p["DiffuseMaterial"] = glm::vec3(0.7f, 0.7f, 1.0f);
+	this->p["AmbientMaterial"] = glm::vec3(0.2f, 0.2f, 0.2f);
 
 	this->p["TessLevelInner"] = 3.0f;
-	this->p["TessLevelOuter"] = 2.0f;
-
-	/*this->p = ShaderProgram(VertexShader("res/texture.vert"), FragmentShader("res/color.frag"));
-
-	this->p["M"] = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f));
-	this->p["V"] = glm::lookAt(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0, 1, 0));
-	this->p["P"] = glm::perspective(45.0f, (float)this->window.width / (float)this->window.height, 0.1f, 10.0f);
-
-	this->p["color"] = glm::vec4(0.7f, 0.7f, 1.0f, 1.0f); */
+	this->p["TessLevelOuter"] = 3.0f;
 }
 
 void TessDemo::initBuffers() {
@@ -89,6 +81,9 @@ void TessDemo::initBuffers() {
 	this->vertices.setAttrib(this->p, "Position", positions, 3, GL_FLOAT);
 
 	this->indices = IndexBuffer(faces);
+
+	 glPointSize(5);
+  glLineWidth(3);
 }
 
 void TessDemo::update(double time) {
@@ -97,10 +92,12 @@ void TessDemo::update(double time) {
 	this->window.clearScreen();
 
 	vertices.bind();
-	glPatchParameteri(GL_PATCH_VERTICES, 1);
-	indices.drawElements(GL_PATCHES);
-	//indices.drawElements();
 
+	glPatchParameteri(GL_PATCH_VERTICES, 3);
+	glPatchParameteri(GL_PATCH_DEFAULT_OUTER_LEVEL, 3);
+	glPatchParameteri(GL_PATCH_DEFAULT_INNER_LEVEL, 3);
+
+	indices.drawElements(GL_PATCHES);
 }
 
 TessDemo::~TessDemo() {

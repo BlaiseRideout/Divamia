@@ -4,7 +4,6 @@
 #include "game.hpp"
 #include "vao.hpp"
 #include "shader.hpp"
-#include "camera.hpp"
 
 class TessDemo : public Game {
 	public:
