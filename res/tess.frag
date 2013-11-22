@@ -29,6 +29,4 @@ void main() {
     color = amplify(d1, 40, -0.5) * amplify(d2, 60, -0.5) * color;
  
     FragColor = vec4(color, 1.0f);
-
-    FragColor = vec4(1.0f, 1.0f, 1.0f, 1.0f);
 }
