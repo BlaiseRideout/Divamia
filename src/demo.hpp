@@ -13,42 +13,42 @@
 
 
 class Demo : public Game {
-	public:
-		Demo();
-		virtual ~Demo();
-	protected:
-		virtual void update();
-		virtual void draw();
-	private:
-		void initGraphics();
-		void initPhysics();
+        public:
+                Demo();
+                virtual ~Demo();
+        protected:
+                virtual void update(double time);
+        private:
+                void initGraphics();
+                void initPhysics();
 
-		Texture t;
-        ShaderProgram p;
-        //Buffer inds;
-        //VAO vao;
-        Model m;
-        FPCamera c;
-        
-        glm::vec3 boxPosition;
+                Texture t;
+                ShaderProgram p;
+                //Buffer inds;
+                //VAO vao;
+                Model m;
+                FPCamera c;
 
-        btBroadphaseInterface* broadphase;
+                glm::vec3 boxPosition;
+                glm::vec4 boxRotation;
 
-        btDefaultCollisionConfiguration* collisionConfiguration;
-        btCollisionDispatcher* dispatcher;
+                btBroadphaseInterface* broadphase;
 
-        btSequentialImpulseConstraintSolver* solver;
+                btDefaultCollisionConfiguration* collisionConfiguration;
+                btCollisionDispatcher* dispatcher;
 
-        btDiscreteDynamicsWorld* dynamicsWorld;
+                btSequentialImpulseConstraintSolver* solver;
 
-        btCollisionShape* groundShape;
-        btCollisionShape* fallShape;
+                btDiscreteDynamicsWorld* dynamicsWorld;
 
-        btDefaultMotionState* groundMotionState;
-        btRigidBody* groundRigidBody;
+                btCollisionShape* groundShape;
+                btCollisionShape* fallShape;
 
-		btDefaultMotionState* fallMotionState;
-        btRigidBody* fallRigidBody;
+                btDefaultMotionState* groundMotionState;
+                btRigidBody* groundRigidBody;
+
+                btDefaultMotionState* fallMotionState;
+                btRigidBody* fallRigidBody;
 };
 
 
