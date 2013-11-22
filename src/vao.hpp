@@ -13,14 +13,17 @@ class VAO {
 
 		void bind();
 		void unbind();
+		void setAttrib(GLuint attribute, Buffer const &b, int size, GLenum type, bool normalized, int divisor, GLsizei stride);
 		void setAttrib(GLuint attribute, Buffer const &b, int size, GLenum type, bool normalized, int divisor);
 		void setAttrib(GLuint attribute, Buffer const &b, int size, GLenum type, bool normalized);
 		void setAttrib(GLuint attribute, Buffer const &b, int size, bool normalized);
 		void setAttrib(GLuint attribute, Buffer const &b, int size);
+		void setAttrib(ShaderProgram &s, std::string name, Buffer const &b, int size, GLenum type, bool normalized, int divisor, GLsizei stride);
 		void setAttrib(ShaderProgram &s, std::string name, Buffer const &b, int size, GLenum type, bool normalized, int divisor);
 		void setAttrib(ShaderProgram &s, std::string name, Buffer const &b, int size, GLenum type, bool normalized);
 		void setAttrib(ShaderProgram &s, std::string name, Buffer const &b, int size, bool normalized);
 		void setAttrib(ShaderProgram &s, std::string name, Buffer const &b, int size);
+		void setAttrib(ShaderProgram &&s, std::string name, Buffer const &b, int size, GLenum type, bool normalized, int divisor, GLsizei stride);
 		void setAttrib(ShaderProgram &&s, std::string name, Buffer const &b, int size, GLenum type, bool normalized, int divisor);
 		void setAttrib(ShaderProgram &&s, std::string name, Buffer const &b, int size, GLenum type, bool normalized);
 		void setAttrib(ShaderProgram &&s, std::string name, Buffer const &b, int size, bool normalized);

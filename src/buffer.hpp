@@ -60,24 +60,27 @@ class Buffer {
 		void unbind(GLenum target) const;
 		void unbind() const;
 
+		void setAttrib(GLuint attribute, int size, GLenum type, bool normalized, int divisor, GLsizei stride) const;
 		void setAttrib(GLuint attribute, int size, GLenum type, bool normalized, int divisor) const;
 		void setAttrib(GLuint attribute, int size, GLenum type, bool normalized) const;
 		void setAttrib(GLuint attribute, int size, bool normalized) const;
 		void setAttrib(GLuint attribute, int size) const;
+		void setAttrib(ShaderProgram &s, std::string name, int size, GLenum type, bool normalized, int divisor, GLsizei stride) const;
 		void setAttrib(ShaderProgram &s, std::string name, int size, GLenum type, bool normalized, int divisor) const;
 		void setAttrib(ShaderProgram &s, std::string name, int size, GLenum type, bool normalized) const;
 		void setAttrib(ShaderProgram &s, std::string name, int size, bool normalized) const;
 		void setAttrib(ShaderProgram &s, std::string name, int size) const;
+		void setAttrib(ShaderProgram &&s, std::string name, int size, GLenum type, bool normalized, int divisor, GLsizei stride) const;
 		void setAttrib(ShaderProgram &&s, std::string name, int size, GLenum type, bool normalized, int divisor) const;
 		void setAttrib(ShaderProgram &&s, std::string name, int size, GLenum type, bool normalized) const;
 		void setAttrib(ShaderProgram &&s, std::string name, int size, bool normalized) const;
 		void setAttrib(ShaderProgram &&s, std::string name, int size) const;
 
-		void drawArrays(GLenum mode);
 		void drawArrays();
-		void drawElements(GLenum mode, GLenum type);
-		void drawElements(GLenum mode);
+		void drawArrays(GLenum mode);
 		void drawElements();
+		void drawElements(GLenum mode);
+		void drawElements(GLenum mode, GLenum type);
 		void drawInstanced(int count);
 		void drawInstanced(GLenum mode, int count);
 		void drawInstanced(GLenum mode, int count, GLenum type);

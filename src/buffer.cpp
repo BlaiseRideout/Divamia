@@ -70,7 +70,7 @@ void Buffer::unbind() const {
     unbind(this->target);
 }
 
-void Buffer::setAttrib(GLuint attribute, int size, GLenum type, bool normalized, int divisor) const {
+void Buffer::setAttrib(GLuint attribute, int size, GLenum type, bool normalized, int divisor, GLsizei stride) const {
     glEnableVertexAttribArray(attribute);
     this->bind();
     glVertexAttribPointer(
@@ -78,10 +78,14 @@ void Buffer::setAttrib(GLuint attribute, int size, GLenum type, bool normalized,
         size,
         type,
         normalized?GL_TRUE:GL_FALSE,
-        0,                                // stride
+        stride,
         (void*)0                          // array buffer offset
     );
     glVertexAttribDivisor(attribute, divisor);
+}
+
+void Buffer::setAttrib(GLuint attribute, int size, GLenum type, bool normalized, int divisor) const {
+    setAttrib(attribute, size, type, normalized, divisor, 0);
 }
 
 void Buffer::setAttrib(GLuint attribute, int size, GLenum type, bool normalized) const {
@@ -96,12 +100,16 @@ void Buffer::setAttrib(GLuint attribute, int size) const {
     setAttrib(attribute, size, GL_FLOAT, false);
 }
 
+void Buffer::setAttrib(ShaderProgram &s, std::string name, int size, GLenum type, bool normalized, int divisor, GLsizei stride) const {
+    setAttrib(s.getAttribLocation(name), size, type, normalized, divisor, stride);
+}
+
 void Buffer::setAttrib(ShaderProgram &s, std::string name, int size, GLenum type, bool normalized, int divisor) const {
-    setAttrib(s.getAttribLocation(name), size, type, normalized, divisor);
+    setAttrib(s, name, size, type, normalized, divisor, 0);
 }
 
 void Buffer::setAttrib(ShaderProgram &s, std::string name, int size, GLenum type, bool normalized) const {
-    setAttrib(s.getAttribLocation(name), size, type, normalized);
+    setAttrib(s, name, size, type, normalized);
 }
 
 void Buffer::setAttrib(ShaderProgram &s, std::string name, int size, bool normalized) const {
@@ -113,12 +121,16 @@ void Buffer::setAttrib(ShaderProgram &s, std::string name, int size) const {
 }
 
 
+void Buffer::setAttrib(ShaderProgram &&s, std::string name, int size, GLenum type, bool normalized, int divisor, GLsizei stride) const {
+    setAttrib(s.getAttribLocation(name), size, type, normalized, divisor, stride);
+}
+
 void Buffer::setAttrib(ShaderProgram &&s, std::string name, int size, GLenum type, bool normalized, int divisor) const {
-    setAttrib(s.getAttribLocation(name), size, type, normalized, divisor);
+    setAttrib(s, name, size, type, normalized, divisor, 0);
 }
 
 void Buffer::setAttrib(ShaderProgram &&s, std::string name, int size, GLenum type, bool normalized) const {
-    setAttrib(s.getAttribLocation(name), size, type, normalized);
+    setAttrib(s, name, size, type, normalized);
 }
 
 void Buffer::setAttrib(ShaderProgram &&s, std::string name, int size, bool normalized) const {

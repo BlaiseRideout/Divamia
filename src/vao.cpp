@@ -6,11 +6,15 @@
 VAO::VAO() : id(0) {
 }
 
-void VAO::setAttrib(GLuint attribute, Buffer const &b, int size, GLenum type, bool normalized, int divisor) {
+void VAO::setAttrib(GLuint attribute, Buffer const &b, int size, GLenum type, bool normalized, int divisor, GLsizei stride) {
 	this->tempBind();
-	b.setAttrib(attribute, size, type, normalized, divisor);
+	b.setAttrib(attribute, size, type, normalized, divisor, stride);
 	this->attribs[attribute] = b;
 	VAO::curBind();
+}
+
+void VAO::setAttrib(GLuint attribute, Buffer const &b, int size, GLenum type, bool normalized, int divisor) {
+	setAttrib(attribute, b, size, type, normalized, divisor, 0);
 }
 
 void VAO::setAttrib(GLuint attribute, Buffer const &b, int size, GLenum type, bool normalized) {
@@ -26,12 +30,16 @@ void VAO::setAttrib(GLuint attribute, Buffer const &b, int size) {
 }
 
 
+void VAO::setAttrib(ShaderProgram &s, std::string name, Buffer const &b, int size, GLenum type, bool normalized, int divisor, GLsizei stride) {
+	setAttrib(s.getAttribLocation(name), b, size, type, normalized, divisor, stride);
+}
+
 void VAO::setAttrib(ShaderProgram &s, std::string name, Buffer const &b, int size, GLenum type, bool normalized, int divisor) {
-	setAttrib(s.getAttribLocation(name), b, size, type, normalized, divisor);
+	setAttrib(s, name, b, size, type, normalized, divisor, 0);
 }
 
 void VAO::setAttrib(ShaderProgram &s, std::string name, Buffer const &b, int size, GLenum type, bool normalized) {
-	setAttrib(s.getAttribLocation(name), b, size, type, normalized, 0);
+	setAttrib(s, name, b, size, type, normalized, 0);
 }
 
 void VAO::setAttrib(ShaderProgram &s, std::string name, Buffer const &b, int size, bool normalized) {
@@ -43,12 +51,16 @@ void VAO::setAttrib(ShaderProgram &s, std::string name, Buffer const &b, int siz
 }
 
 
+void VAO::setAttrib(ShaderProgram &&s, std::string name, Buffer const &b, int size, GLenum type, bool normalized, int divisor, GLsizei stride) {
+	setAttrib(s.getAttribLocation(name), b, size, type, normalized, divisor, stride);
+}
+
 void VAO::setAttrib(ShaderProgram &&s, std::string name, Buffer const &b, int size, GLenum type, bool normalized, int divisor) {
-	setAttrib(s.getAttribLocation(name), b, size, type, normalized, divisor);
+	setAttrib(s, name, b, size, type, normalized, divisor, 0);
 }
 
 void VAO::setAttrib(ShaderProgram &&s, std::string name, Buffer const &b, int size, GLenum type, bool normalized) {
-	setAttrib(s.getAttribLocation(name), b, size, type, normalized, 0);
+	setAttrib(s, name, b, size, type, normalized, 0);
 }
 
 void VAO::setAttrib(ShaderProgram &&s, std::string name, Buffer const &b, int size, bool normalized) {
