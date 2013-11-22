@@ -11,7 +11,6 @@ class Game {
         Game(std::string title, int majorVersion, int minorVersion);
         Game(std::string title);
         Game();
-		Game(std::string title, int majorVersion, int minorVersion);
         virtual ~Game();
         void run();
     protected:
@@ -20,7 +19,6 @@ class Game {
         double time;
         bool running;
         Window window;
-		double time;
 };
 
 #endif
