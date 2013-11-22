@@ -8,6 +8,7 @@
 #include <memory>
 #include <vector>
 #include <iostream>
+#include <algorithm>
 
 #include "texture.hpp"
 
@@ -87,10 +88,10 @@ class Uniform {
 
 class ShaderProgram {
 	public:
-		ShaderProgram();
 		ShaderProgram(ShaderProgram const &s);
 		template<typename ...S>
-		ShaderProgram(S... s);
+		ShaderProgram(Shader s, S... ss);
+		ShaderProgram();
 		~ShaderProgram();
 
 		ShaderProgram &operator=(ShaderProgram const &s);
@@ -129,14 +130,15 @@ class ShaderProgram {
 };
 
 template<typename ...S>
-ShaderProgram::ShaderProgram(S... s) {
+ShaderProgram::ShaderProgram(Shader s, S... ss) {
 	GLint Result = GL_FALSE;
     int InfoLogLength;
 
 	// Link the program
     std::cout << "Linking program" << std::endl;
     this->id = glCreateProgram();
-    std::vector<Shader> shaders({s...});
+	glAttachShader(this->id, s.id);
+    std::vector<Shader> shaders({ss...});
     for(auto i = shaders.begin(); i != shaders.end(); ++i)
     	glAttachShader(this->id, i->id);
     glLinkProgram(this->id);
@@ -155,6 +157,5 @@ ShaderProgram::ShaderProgram(S... s) {
     ShaderProgram::refCount.insert(std::pair<GLuint, unsigned>(this->id, 1));
     ShaderProgram::gtextures.insert(std::pair<GLuint, std::vector<Texture>>(this->id, std::vector<Texture>()));
 }
-
 
 #endif

@@ -19,6 +19,8 @@ class TessDemo : public Game {
 
 		VAO	vertices;
 		IndexBuffer indices;
+
+		FPCamera c;
 };
 
 #endif

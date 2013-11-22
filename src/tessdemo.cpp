@@ -3,7 +3,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 
-TessDemo::TessDemo() : Game("Tesselation Demo", 4, 0) {
+TessDemo::TessDemo() : Game("Tesselation Demo", 4, 2), c(window) {
 	initShader();
 	initBuffers();
 }
@@ -78,16 +78,19 @@ void TessDemo::initBuffers() {
 
 	Buffer positions(verts);
 
-	this->vertices.setAttrib(this->p, "Position", positions, 3, GL_FLOAT);
+	this->vertices.setAttrib(this->p, "Position", positions, 3);
 
 	this->indices = IndexBuffer(faces);
 
-	 glPointSize(5);
-  glLineWidth(3);
+	glPointSize(5);
+	glLineWidth(3);
 }
 
 void TessDemo::update(double time) {
 	running = running && this->window.getKey(GLFW_KEY_ESCAPE) == GLFW_RELEASE;
+
+	this->c.update();
+	this->p["V"] = this->c.viewMatrix();
 
 	this->window.clearScreen();
 

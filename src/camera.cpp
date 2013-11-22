@@ -20,10 +20,10 @@ FPCamera::FPCamera(Window const &window, glm::vec3 const &position, glm::vec3 co
 	}
 }
 
-FPCamera::FPCamera(Window const &window, glm::vec3 const &position, glm::vec3 const &lookAt, float sensitivity) : FPCamera(window, position, sensitivity, .05) {
+FPCamera::FPCamera(Window const &window, glm::vec3 const &position, glm::vec3 const &lookAt, float sensitivity) : FPCamera(window, position, sensitivity, .05f) {
 }
 
-FPCamera::FPCamera(Window const &window, glm::vec3 const &position, glm::vec3 const &lookAt) : FPCamera(window, position, 0.005) {
+FPCamera::FPCamera(Window const &window, glm::vec3 const &position, glm::vec3 const &lookAt) : FPCamera(window, position, 0.005f) {
 }
 
 FPCamera::FPCamera(Window const &window, glm::vec3 const &position, float sensitivity, float speed) : FPCamera(window, position, glm::vec3(0), sensitivity, speed) {
@@ -32,7 +32,7 @@ FPCamera::FPCamera(Window const &window, glm::vec3 const &position, float sensit
 FPCamera::FPCamera(Window const &window, glm::vec3 const &position, float sensitivity) : FPCamera(window, position, glm::vec3(0), sensitivity) {
 }
 
-FPCamera::FPCamera(Window const &window, glm::vec3 const &position) : FPCamera(window, position, 0.005) {
+FPCamera::FPCamera(Window const &window, glm::vec3 const &position) : FPCamera(window, position, 0.005f) {
 }
 
 FPCamera::FPCamera(Window const &window, float sensitivity, float speed) : FPCamera(window, glm::vec3(0.0f), sensitivity, speed) {
@@ -41,7 +41,7 @@ FPCamera::FPCamera(Window const &window, float sensitivity, float speed) : FPCam
 FPCamera::FPCamera(Window const &window, float sensitivity) : FPCamera(window, glm::vec3(0.0f), sensitivity) {
 }
 
-FPCamera::FPCamera(Window const &window) : FPCamera(window, .005) {
+FPCamera::FPCamera(Window const &window) : FPCamera(window, .005f) {
 
 }
 
