@@ -78,9 +78,9 @@ class Buffer {
 		void drawElements(GLenum mode, GLenum type);
 		void drawElements(GLenum mode);
 		void drawElements();
-		void drawInstanced(int count);
-		void drawInstanced(GLenum mode, int count);
-		void drawInstanced(GLenum mode, int count, GLenum type);
+		void drawInstanced(int count) const;
+		void drawInstanced(GLenum mode, int count) const;
+		void drawInstanced(GLenum mode, int count, GLenum type) const;
 	protected:
 		void del();
 

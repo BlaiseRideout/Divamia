@@ -155,15 +155,15 @@ void Buffer::drawElements(GLenum mode, GLenum type) {
     );
 }
 
-void Buffer::drawInstanced(int count) {
+void Buffer::drawInstanced(int count) const {
     drawInstanced(GL_TRIANGLES, count);
 }
 
-void Buffer::drawInstanced(GLenum mode, int count) {
+void Buffer::drawInstanced(GLenum mode, int count) const {
     drawInstanced(mode, count, GL_UNSIGNED_INT);
 }
 
-void Buffer::drawInstanced(GLenum mode, int count, GLenum type) {
+void Buffer::drawInstanced(GLenum mode, int count, GLenum type) const {
     this->bind(GL_ELEMENT_ARRAY_BUFFER);
     glDrawElementsInstanced(
         mode,
