@@ -142,7 +142,7 @@ ShaderProgram::ShaderProgram(S... s) {
     for(auto i = shaders.begin(); i != shaders.end(); ++i)
     	glAttachShader(this->id, i->id);
     glLinkProgram(this->id);
- 
+
     // Check the program
     glGetProgramiv(this->id, GL_LINK_STATUS, &Result);
     if(Result == GL_FALSE) {

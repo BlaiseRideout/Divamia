@@ -29,13 +29,13 @@ void Texture::bind() const {
 Texture::Texture() {
 }
 
-Texture::Texture(Texture const &t) : id(t.id) {
+Texture::Texture(const Texture &t) : id(t.id) {
 	auto iterid = Texture::refCount.find(this->id);
     if(iterid != Texture::refCount.end())
         iterid->second = iterid->second + 1;
 }
 
-Texture::Texture(std::string filename) : Texture(filename, GL_LINEAR, GL_LINEAR) {
+Texture::Texture(std::string filename) : Texture(filename, GL_NEAREST, GL_NEAREST) {
 }
 
 Texture::Texture(std::string filename, GLint filter) : Texture(filename, filter, filter) {
@@ -104,6 +104,10 @@ Texture &Texture::operator=(Texture const &s) {
 Texture &Texture::operator=(Texture &&s) {
 	std::swap(s.id, this->id);
 	return *this;
+}
+
+bool Texture::operator==(Texture const &s) {
+	return s.id == this->id;
 }
 
 GLuint Texture::currentTexture;

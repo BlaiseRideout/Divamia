@@ -8,14 +8,14 @@
 class Texture {
 	public:
 		Texture();
-		Texture(Texture const &t);
-		Texture(Texture &&t);
+		Texture(const Texture &t);
 		Texture(std::string name);
 		Texture(std::string name, GLint filter);
 		Texture(std::string name, GLint mag_filter, GLint min_filter);
 		~Texture();
 		Texture &operator=(Texture const &s);
 		Texture &operator=(Texture &&s);
+		bool operator==(Texture const &s);
 
 		unsigned int width();
 		unsigned int height();
