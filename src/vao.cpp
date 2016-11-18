@@ -43,22 +43,6 @@ void VAO::setAttrib(ShaderProgram &s, std::string name, Buffer const &b, int siz
 }
 
 
-void VAO::setAttrib(ShaderProgram &&s, std::string name, Buffer const &b, int size, GLenum type, bool normalized, int divisor) {
-	setAttrib(s.getAttribLocation(name), b, size, type, normalized, divisor);
-}
-
-void VAO::setAttrib(ShaderProgram &&s, std::string name, Buffer const &b, int size, GLenum type, bool normalized) {
-	setAttrib(s.getAttribLocation(name), b, size, type, normalized, 0);
-}
-
-void VAO::setAttrib(ShaderProgram &&s, std::string name, Buffer const &b, int size, bool normalized) {
-	setAttrib(s, name, b, size, GL_FLOAT, normalized);
-}
-
-void VAO::setAttrib(ShaderProgram &&s, std::string name, Buffer const &b, int size) {
-	setAttrib(s, name, b, size, GL_FLOAT, false);
-}
-
 void VAO::bind() {
 	this->tempBind();
 	VAO::currentVAO = this->id;

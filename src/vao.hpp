@@ -21,10 +21,6 @@ class VAO {
 		void setAttrib(ShaderProgram &s, std::string name, Buffer const &b, int size, GLenum type, bool normalized);
 		void setAttrib(ShaderProgram &s, std::string name, Buffer const &b, int size, bool normalized);
 		void setAttrib(ShaderProgram &s, std::string name, Buffer const &b, int size);
-		void setAttrib(ShaderProgram &&s, std::string name, Buffer const &b, int size, GLenum type, bool normalized, int divisor);
-		void setAttrib(ShaderProgram &&s, std::string name, Buffer const &b, int size, GLenum type, bool normalized);
-		void setAttrib(ShaderProgram &&s, std::string name, Buffer const &b, int size, bool normalized);
-		void setAttrib(ShaderProgram &&s, std::string name, Buffer const &b, int size);
 	protected:
 		void tempBind();
 		static void curBind();
