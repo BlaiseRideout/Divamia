@@ -15,8 +15,8 @@ class Game {
         virtual void update() = 0;
         virtual void draw() = 0;
 
-        bool running;
         Window window;
+        bool running;
 };
 
 #endif

@@ -1,8 +1,7 @@
 #include "game.hpp"
 
 
-Game::Game() : window(800, 600, false, 3, 3) {
-  this->running = true;
+Game::Game() : window(800, 600, false, 2, 0), running(true) {
 }
 
 Game::~Game() {

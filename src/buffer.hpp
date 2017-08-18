@@ -37,8 +37,8 @@ class Buffer {
 		void loadData(std::vector<T> const &data, GLenum target, GLenum usage) {
 			if(this->id == 0) {
 				glGenBuffers(1, &this->id);
-    			Buffer::refCount.insert(std::pair<GLint, unsigned>(this->id, 1));
-    		}
+				Buffer::refCount.insert(std::pair<GLint, unsigned>(this->id, 1));
+			}
 			glBindBuffer(target, this->id);
 			glBufferData(target, data.size() * sizeof(T), &data[0], usage);
 			this->target = target;
@@ -78,9 +78,9 @@ class Buffer {
 		void drawElements(GLenum mode, GLenum type);
 		void drawElements(GLenum mode);
 		void drawElements();
-		void drawInstanced(int count);
-		void drawInstanced(GLenum mode, int count);
-		void drawInstanced(GLenum mode, int count, GLenum type);
+		void drawInstanced(int count) const;
+		void drawInstanced(GLenum mode, int count) const;
+		void drawInstanced(GLenum mode, int count, GLenum type) const;
 	protected:
 		void del();
 

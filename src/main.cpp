@@ -2,11 +2,11 @@
 #include <iostream>
 #include <glm/glm.hpp>
 
-#include "demo.hpp"
+#include "ellipse.hpp"
 
 int main(int argc, char **argv) {
   try {
-    Demo game;
+    Ellipse game;
     game.run();
     return 0;
   }

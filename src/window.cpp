@@ -17,13 +17,13 @@ Window::Window(int width, int height, bool fullscreen, std::string title, int ma
   initGL();
 }
 
-Window::Window(int width, int height, bool fullscreen, std::string title) : Window(width, height, fullscreen, title, 3, 1) {
+Window::Window(int width, int height, bool fullscreen, std::string title) : Window(width, height, fullscreen, title, 2, 1) {
 }
 
 Window::Window(int width, int height, bool fullscreen, int majorVersion, int minorVersion) : Window(width, height, fullscreen, "Divamia", majorVersion, minorVersion) {
 }
 
-Window::Window(int width, int height, bool fullscreen) : Window(width, height, fullscreen, "Divamia", 3, 1) {
+Window::Window(int width, int height, bool fullscreen) : Window(width, height, fullscreen, "Divamia", 2, 1) {
 }
 
 Window::Window(bool fullscreen) : Window(800, 600, fullscreen) {
@@ -57,7 +57,7 @@ Window::~Window() {
       glfwDestroyWindow(window);
     }
   }
-  
+
 }
 
 Window::operator GLFWwindow*() const {
@@ -139,7 +139,7 @@ void Window::initGlfw() {
 
   //vsync: 0 = no, 1 = yes
   glfwSwapInterval(1);
-  
+
   this->makeCurrent();
 
   std::cout << glGetString(GL_VERSION) << std::endl;

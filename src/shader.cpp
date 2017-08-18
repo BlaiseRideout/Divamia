@@ -4,50 +4,41 @@
 #include <stdexcept>
 #include <glm/glm.hpp>
 #include <sstream>
+#include <algorithm>
 
 #include "shader.hpp"
 
 Shader::Shader(std::string const &filename, GLenum type) {
-    this->id = glCreateShader(type);
-    Shader::refCount.insert(std::pair<GLint, int>(this->id, 1));
-    this->load(filename);
+	this->id = glCreateShader(type);
+	this->load(filename);
+	incRef();
 }
 
 Shader::Shader(Shader const &s) : id(s.id) {
-    auto iterid = Shader::refCount.find(this->id);
-    if(iterid != Shader::refCount.end())
-        iterid->second = iterid->second + 1;
+	incRef();
+}
+
+Shader::Shader(Shader &&s) {
+	std::swap(id, s.id);
 }
 
 Shader::Shader() {
 }
 
 Shader::~Shader() {
-    auto iterid = Shader::refCount.find(this->id);
-    if(iterid != Shader::refCount.end()) {
-        iterid->second = iterid->second - 1;
-        if(iterid->second == 0)
-            this->del();
-    }
+	decRef();
 }
 
 Shader &Shader::operator=(Shader const &s) {
-    auto iterid = Shader::refCount.find(this->id);
-    if(iterid != Shader::refCount.end()) {
-        iterid->second = iterid->second - 1;
-        if(iterid->second == 0)
-            this->del();
-    }
-    this->id = s.id;
-    iterid = Shader::refCount.find(this->id);
-    if(iterid != Shader::refCount.end())
-        iterid->second = iterid->second + 1;
-    return *this;
+	decRef();
+	this->id = s.id;
+	incRef();
+	return *this;
 }
 
 Shader &Shader::operator=(Shader &&s) {
-    std::swap(s.id, this->id);
-    return *this;
+	std::swap(s.id, this->id);
+	return *this;
 }
 
 void Shader::load(std::string const &filename) {
@@ -55,13 +46,13 @@ void Shader::load(std::string const &filename) {
 
     GLint Result = GL_FALSE;
     int InfoLogLength;
- 
+
     // Compile Shader
     std::cout << "Compiling shader : " << filename << std::endl;
     char const *SourcePointer = ShaderCode.c_str();
     glShaderSource(this->id, 1, &SourcePointer , NULL);
     glCompileShader(this->id);
- 
+
     // Check Shader
     glGetShaderiv(this->id, GL_COMPILE_STATUS, &Result);
     if(Result == GL_FALSE) {
@@ -89,7 +80,7 @@ std::string Shader::loadCode(std::string const &filename) {
 }
 
 void Shader::del() {
-    glDeleteShader(this->id);
+	glDeleteShader(this->id);
 }
 
 VertexShader::VertexShader(std::string const &filename) : Shader(filename, GL_VERTEX_SHADER) {
@@ -112,57 +103,79 @@ TessControlShader::TessControlShader(std::string const &filename) : Shader(filen
 TessEvaluationShader::TessEvaluationShader(std::string const &filename) : Shader(filename, GL_TESS_EVALUATION_SHADER) {
 }
 
+void Shader::decRef() {
+	if(id == 0)
+		return;
+	auto iterid = Shader::refCount.find(this->id);
+	if(iterid != Shader::refCount.end()) {
+		iterid->second = iterid->second - 1;
+		if(iterid->second == 0) {
+			this->del();
+			Shader::refCount.erase(iterid);
+		}
+	}
+	else
+		std::cerr << "Asked to decrement untracked shader " << id << "!" << std::endl;
+}
+
+void Shader::incRef() {
+	if(id == 0)
+		return;
+	auto iterid = Shader::refCount.find(id);
+	if(iterid != Shader::refCount.end())
+			iterid->second = iterid->second + 1;
+	else
+		Shader::refCount.insert(std::pair<GLint, int>(id, 1));
+}
+
 ShaderProgram::ShaderProgram() : id(0) {
 }
 
-ShaderProgram::ShaderProgram(ShaderProgram const &s) : id(s.id) {
-    auto iterid = ShaderProgram::refCount.find(this->id);
-    if(iterid != ShaderProgram::refCount.end())
-        iterid->second = iterid->second + 1;
+ShaderProgram::ShaderProgram(ShaderProgram const &s) : id(s.id), shaders(s.shaders) {
+	incRef();
+}
+
+ShaderProgram::ShaderProgram(ShaderProgram &&s) {
+	std::swap(id, s.id);
+	std::swap(shaders, s.shaders);
+	std::swap(uids, s.uids);
+	std::swap(aids, s.aids);
 }
 
 ShaderProgram::~ShaderProgram() {
-    auto iterid = ShaderProgram::refCount.find(this->id);
-    if(iterid != ShaderProgram::refCount.end()) {
-        iterid->second = iterid->second - 1;
-        if(iterid->second == 0)
-            del();
-    }
+	decRef();
 }
 
 void ShaderProgram::del() {
-    glDeleteProgram(this->id);
-    
-    auto iterid = ShaderProgram::refCount.find(this->id);
-    if(iterid != ShaderProgram::refCount.end())
-        ShaderProgram::refCount.erase(iterid);
+	glDeleteProgram(this->id);
 
-    auto i = ShaderProgram::gtextures.find(this->id);
-    if(i != ShaderProgram::gtextures.end())
-        ShaderProgram::gtextures.erase(i);
+	auto iterid = ShaderProgram::refCount.find(this->id);
+	if(iterid != ShaderProgram::refCount.end())
+		ShaderProgram::refCount.erase(iterid);
+
+	auto i = ShaderProgram::gtextures.find(this->id);
+	if(i != ShaderProgram::gtextures.end())
+		ShaderProgram::gtextures.erase(i);
 }
 
 ShaderProgram &ShaderProgram::operator=(ShaderProgram const &s) {
-    auto iterid = ShaderProgram::refCount.find(this->id);
-    if(iterid != ShaderProgram::refCount.end()) {
-        iterid->second = iterid->second - 1;
-        if(iterid->second == 0)
-            del();
-    }
-    this->id = s.id;
-    iterid = ShaderProgram::refCount.find(this->id);
-    if(iterid != ShaderProgram::refCount.end())
-        iterid->second = iterid->second + 1;
-    return *this;
+	decRef();
+	this->id = s.id;
+	this->shaders = s.shaders;
+	incRef();
+	return *this;
 }
 
 ShaderProgram &ShaderProgram::operator=(ShaderProgram &&s) {
-    std::swap(this->id, s.id);
-    return *this;
+	std::swap(this->id, s.id);
+	std::swap(shaders, s.shaders);
+	std::swap(uids, s.uids);
+	std::swap(aids, s.aids);
+	return *this;
 }
 
 ShaderProgram::operator GLuint() {
-    return this->id;
+	return this->id;
 }
 
 void ShaderProgram::setUniform(std::string const &name, int value) {
@@ -207,31 +220,33 @@ void ShaderProgram::setUniform(std::string const &name, glm::mat4 const &value) 
     glUseProgram(ShaderProgram::currentProgram);
 }
 
-void ShaderProgram::setUniform(std::string const &name, Texture const &value) {
-    glUseProgram(this->id);
-    
-    std::vector<Texture> &textures = this->textures();
+void ShaderProgram::setUniform(std::string const &name, Texture const &val) {
+	glUseProgram(this->id);
 
-    unsigned index = textures.size();
+	std::vector<Texture> &textures = this->textures();
+	unsigned index = textures.size();
+	auto tex = std::find(textures.begin(), textures.end(), val);
+	if(tex != textures.end())
+		index = tex - textures.begin();
+	else
+		textures.push_back(val);
 
-    glUniform1i(this->getUniformLocation(name), index);
+	glUniform1i(this->getUniformLocation(name), index);
+	glActiveTexture(GL_TEXTURE0 + index);
+	textures[index].bind();
 
-    glActiveTexture(GL_TEXTURE0 + index);
-    textures.push_back(value);
-    textures[index].bind();
+	if(ShaderProgram::currentProgram != this->id) {
+		glUseProgram(ShaderProgram::currentProgram);
 
-    if(ShaderProgram::currentProgram != this->id) {
-        glUseProgram(ShaderProgram::currentProgram);
-
-        auto i = ShaderProgram::gtextures.find(ShaderProgram::currentProgram);
-        if(i != ShaderProgram::gtextures.end()) {
-            std::vector<Texture> &textures = i->second;
-            if(textures.size() > index) {
-                glActiveTexture(GL_TEXTURE0 + index);
-                textures[index].bind();
-            }
-        }
-    }
+		auto i = ShaderProgram::gtextures.find(ShaderProgram::currentProgram);
+		if(i != ShaderProgram::gtextures.end()) {
+			std::vector<Texture> &textures = i->second;
+			if(textures.size() > index) {
+				glActiveTexture(GL_TEXTURE0 + index);
+				textures[index].bind();
+			}
+		}
+	}
 }
 
 Uniform ShaderProgram::operator[](std::string const &name) {
@@ -267,7 +282,7 @@ GLuint ShaderProgram::getAttribLocation(std::string const &name) {
         else
             this->aids.insert(std::pair<std::string, GLuint>(name, aid));
         return aid;
-    } 
+    }
 }
 
 bool ShaderProgram::isSet(std::string name) {
@@ -276,24 +291,68 @@ bool ShaderProgram::isSet(std::string name) {
 }
 
 void ShaderProgram::use() {
-    glUseProgram(this->id);
-    for(unsigned i = 0; i < this->textures().size(); ++i) {
-        glActiveTexture(GL_TEXTURE0 + i);
-        this->textures()[i].bind();
-    }
     ShaderProgram::currentProgram = this->id;
+		ShaderProgram::useShader(this->id);
+}
+
+void ShaderProgram::tempUse() {
+		ShaderProgram::useShader(this->id);
+}
+
+void ShaderProgram::useCurrent() {
+	if(ShaderProgram::currentProgram != 0)
+		ShaderProgram::useShader(ShaderProgram::currentProgram);
+}
+
+void ShaderProgram::useShader(GLuint shader) {
+	if(shader == 0)
+		return;
+	glUseProgram(shader);
+	auto _textures = gtextures.find(shader);
+	if(_textures != ShaderProgram::gtextures.end()) {
+		auto textures = _textures->second;
+		for(unsigned i = 0; i < textures.size(); ++i) {
+			glActiveTexture(GL_TEXTURE0 + i);
+			textures[i].bind();
+		}
+	}
 }
 
 std::vector<Texture> &ShaderProgram::textures() {
-    auto i = ShaderProgram::gtextures.find(this->id);
-    if(i != ShaderProgram::gtextures.end())
-        return i->second;
-    else if(this->id == 0)
-        throw std::runtime_error("Error: Shader program not loaded yet");
-    else {
-        ShaderProgram::gtextures.insert(std::pair<GLuint, std::vector<Texture>>(this->id, std::vector<Texture>()));
-        return this->textures();
-    }
+	if(this->id == 0)
+		throw std::runtime_error("Error: Shader program not loaded yet");
+
+	auto i = ShaderProgram::gtextures.find(this->id);
+	if(i != ShaderProgram::gtextures.end())
+			return i->second;
+	else {
+			ShaderProgram::gtextures.insert(std::pair<GLuint, std::vector<Texture>>(this->id, std::vector<Texture>()));
+			return this->textures();
+	}
+}
+
+void ShaderProgram::decRef() {
+	if(id == 0)
+		return;
+	auto iterid = ShaderProgram::refCount.find(this->id);
+	if(iterid != ShaderProgram::refCount.end()) {
+		iterid->second = iterid->second - 1;
+		if(iterid->second == 0) {
+			this->del();
+		}
+	}
+	else
+		std::cerr << "Asked to decrement untracked shaderprogram " << id << "!" << std::endl;
+}
+
+void ShaderProgram::incRef() {
+	if(id == 0)
+		return;
+	auto iterid = ShaderProgram::refCount.find(this->id);
+	if(iterid != ShaderProgram::refCount.end())
+			iterid->second = iterid->second + 1;
+	else
+		ShaderProgram::refCount.insert(std::pair<GLint, int>(this->id, 1));
 }
 
 Uniform::Uniform(GLuint program, GLuint id) : program(program), id(id) {
@@ -349,34 +408,40 @@ Uniform &Uniform::operator=(glm::mat4 const &val) {
 }
 
 Uniform &Uniform::operator=(Texture const &val) {
-    glUseProgram(this->program);
+	glUseProgram(this->program);
 
-    unsigned index = 0;
-    auto i = ShaderProgram::gtextures.find(this->program);
-    if(i != ShaderProgram::gtextures.end()) {
-        std::vector<Texture> &textures = i->second;
-        index = textures.size();
-        glUniform1i(this->id, index);
+	unsigned index = 0;
+	auto i = ShaderProgram::gtextures.find(this->program);
+	if(i != ShaderProgram::gtextures.end()) {
+		std::vector<Texture> &textures = i->second;
+		auto tex = std::find(textures.begin(), textures.end(), val);
+		if(tex != textures.end())
+			index = tex - textures.begin();
+		else {
+			index = textures.size();
 
-        glActiveTexture(GL_TEXTURE0 + index);
-        textures.push_back(val);
-        textures[index].bind();
-    }
+			textures.push_back(val);
+		}
+		glUniform1i(this->id, index);
 
-    if(ShaderProgram::currentProgram != this->program) {
-        glUseProgram(ShaderProgram::currentProgram);
+		glActiveTexture(GL_TEXTURE0 + index);
+		textures[index].bind();
+	}
 
-        i = ShaderProgram::gtextures.find(ShaderProgram::currentProgram);
-        if(i != ShaderProgram::gtextures.end()) {
-            std::vector<Texture> &textures = i->second;
-            if(textures.size() > index) {
-                glActiveTexture(GL_TEXTURE0 + index);
-                textures[index].bind();
-            }
-        }
-    }
+	if(ShaderProgram::currentProgram != this->program) {
+		glUseProgram(ShaderProgram::currentProgram);
 
-    return *this;
+		i = ShaderProgram::gtextures.find(ShaderProgram::currentProgram);
+		if(i != ShaderProgram::gtextures.end()) {
+			std::vector<Texture> &textures = i->second;
+			if(textures.size() > index) {
+				glActiveTexture(GL_TEXTURE0 + index);
+				textures[index].bind();
+			}
+		}
+	}
+
+	return *this;
 }
 
 std::string Uniform::getName() {
@@ -403,7 +468,7 @@ GLint Uniform::getSize() {
     return size;
 }
 
-GLuint ShaderProgram::currentProgram;
+GLuint ShaderProgram::currentProgram = 0;
 std::map<GLuint, unsigned> Shader::refCount;
 std::map<GLuint, unsigned> ShaderProgram::refCount;
 std::map<GLuint, std::vector<Texture>> ShaderProgram::gtextures;

@@ -21,6 +21,7 @@ class Shader {
 		Shader();
 		Shader(std::string const &filename, GLenum type);
 		Shader(Shader const &s);
+		Shader(Shader &&s);
 		~Shader();
 
 		Shader &operator=(Shader const &s);
@@ -32,6 +33,8 @@ class Shader {
 		void load(std::string const &filename);
 		std::string loadCode(std::string const &filename);
 		void del();
+		void decRef();
+		void incRef();
 
 		static std::map<GLuint, unsigned int> refCount;
 };
@@ -92,8 +95,9 @@ class ShaderProgram {
 	public:
 		ShaderProgram();
 		ShaderProgram(ShaderProgram const &s);
+		ShaderProgram(ShaderProgram &&s);
 		template<typename ...S>
-		ShaderProgram(S... s);
+		ShaderProgram(S const&...s);
 		~ShaderProgram();
 
 		ShaderProgram &operator=(ShaderProgram const &s);
@@ -116,12 +120,18 @@ class ShaderProgram {
 		Uniform operator[](const char *name);
 		bool isSet(std::string);
 		void use();
+		void useCurrent();
+		void tempUse();
 
 		GLuint id;
 	protected:
 		void del();
+		void useShader(GLuint shader);
 		std::vector<Texture> &textures();
+		void incRef();
+		void decRef();
 
+		std::vector<Shader> shaders;
 		std::map<std::string, GLuint> uids;
 		std::map<std::string, GLuint> aids;
 		static std::map<GLuint, std::vector<Texture>> gtextures;
@@ -131,31 +141,30 @@ class ShaderProgram {
 };
 
 template<typename ...S>
-ShaderProgram::ShaderProgram(S... s) {
+ShaderProgram::ShaderProgram(S const&...s) : shaders({s...}) {
 	GLint Result = GL_FALSE;
-    int InfoLogLength;
+	int InfoLogLength;
 
 	// Link the program
-    std::cout << "Linking program" << std::endl;
-    this->id = glCreateProgram();
-    std::vector<Shader> shaders({s...});
-    for(auto i = shaders.begin(); i != shaders.end(); ++i)
-    	glAttachShader(this->id, i->id);
-    glLinkProgram(this->id);
- 
-    // Check the program
-    glGetProgramiv(this->id, GL_LINK_STATUS, &Result);
-    if(Result == GL_FALSE) {
-        glGetProgramiv(this->id, GL_INFO_LOG_LENGTH, &InfoLogLength);
-        std::string ProgramErrorMessage;
-        ProgramErrorMessage.resize(std::max(InfoLogLength, int(1)));
-        glGetProgramInfoLog(this->id, InfoLogLength, NULL, &ProgramErrorMessage[0]);
+	std::cout << "Linking program" << std::endl;
+	this->id = glCreateProgram();
+	for(auto i = shaders.begin(); i != shaders.end(); ++i)
+		glAttachShader(this->id, i->id);
+	glLinkProgram(this->id);
 
-        throw std::runtime_error(ProgramErrorMessage);
-    }
+	// Check the program
+	glGetProgramiv(this->id, GL_LINK_STATUS, &Result);
+	if(Result == GL_FALSE) {
+			glGetProgramiv(this->id, GL_INFO_LOG_LENGTH, &InfoLogLength);
+			std::string ProgramErrorMessage;
+			ProgramErrorMessage.resize(std::max(InfoLogLength, int(1)));
+			glGetProgramInfoLog(this->id, InfoLogLength, NULL, &ProgramErrorMessage[0]);
 
-    ShaderProgram::refCount.insert(std::pair<GLuint, unsigned>(this->id, 1));
-    ShaderProgram::gtextures.insert(std::pair<GLuint, std::vector<Texture>>(this->id, std::vector<Texture>()));
+			throw std::runtime_error(ProgramErrorMessage);
+	}
+
+	incRef();
+	ShaderProgram::gtextures.insert(std::pair<GLuint, std::vector<Texture>>(this->id, std::vector<Texture>()));
 }
 
 
