@@ -28,7 +28,7 @@ class Texture {
 		Texture &operator=(Texture const &s);
 		Texture &operator=(Texture &&s);
 		Texture &operator=(Image const &i);
-		bool operator==(const Texture &s);
+		bool operator==(Texture const &s);
 
 		unsigned int width();
 		unsigned int height();
