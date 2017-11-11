@@ -8,6 +8,7 @@
 #include <memory>
 #include <vector>
 #include <iostream>
+#include <initializer_list>
 
 #include "texture.hpp"
 
@@ -15,6 +16,7 @@ class Shader;
 class VertexShader;
 class FragmentShader;
 class ShaderProgram;
+class Uniform;
 
 class Shader {
 	public:
@@ -71,101 +73,76 @@ class TessEvaluationShader : public Shader {
 		TessEvaluationShader(std::string const &filename);
 };
 
-class Uniform {
-	public:
-		Uniform(GLuint program, GLuint id);
-		Uniform &operator=(int val);
-		Uniform &operator=(unsigned int val);
-		Uniform &operator=(float val);
-		Uniform &operator=(glm::vec4 const &val);
-		Uniform &operator=(glm::vec3 const &val);
-		Uniform &operator=(glm::vec2 const &val);
-		Uniform &operator=(glm::mat4 const &val);
-		Uniform &operator=(Texture const &val);
-
-		std::string getName();
-		GLenum getType();
-		GLint getSize();
-	protected:
-		GLuint program;
-		GLuint id;
-};
-
 class ShaderProgram {
 	public:
 		ShaderProgram();
 		ShaderProgram(ShaderProgram const &s);
 		ShaderProgram(ShaderProgram &&s);
-		template<typename ...S>
-		ShaderProgram(S const&...s);
+		ShaderProgram(std::initializer_list<Shader> shaders);
 		~ShaderProgram();
 
 		ShaderProgram &operator=(ShaderProgram const &s);
 		ShaderProgram &operator=(ShaderProgram &&s);
-		operator GLuint();
+		operator GLuint() const;
 
-		void setUniform(std::string const &name, int value);
-		void setUniform(std::string const &name, unsigned int value);
-		void setUniform(std::string const &name, float value);
-		void setUniform(std::string const &name, glm::vec4 const &value);
-		void setUniform(std::string const &name, glm::vec3 const &value);
-		void setUniform(std::string const &name, glm::vec2 const &value);
-		void setUniform(std::string const &name, glm::mat4 const &value);
-		void setUniform(std::string const &name, Texture const &value);
+		void setUniform(GLuint name, int value) const;
+		void setUniform(GLuint name, unsigned int value) const;
+		void setUniform(GLuint name, float value) const;
+		void setUniform(GLuint name, glm::vec4 const &value) const;
+		void setUniform(GLuint name, glm::vec3 const &value) const;
+		void setUniform(GLuint name, glm::vec2 const &value) const;
+		void setUniform(GLuint name, glm::mat4 const &value) const;
+		void setUniform(GLuint name, Texture const &value) const;
+		template<typename T>
+		void setUniform(std::string const &name, T const &val) const {
+			setUniform(getUniformLocation(name), val);
+		}
 
-		GLuint getUniformLocation(std::string const &name);
-		GLuint getAttribLocation(std::string const &name);
+		GLuint getUniformLocation(std::string const &name) const;
+		GLuint getAttribLocation(std::string const &name) const;
 
-		Uniform operator[](std::string const &name);
-		Uniform operator[](const char *name);
-		bool isSet(std::string);
-		void use();
-		void useCurrent();
-		void tempUse();
+		Uniform operator[](std::string const &name) const;
+		Uniform operator[](const char *name) const;
+		void use() const;
 
 		GLuint id;
 	protected:
 		void del();
-		void useShader(GLuint shader);
-		std::vector<Texture> &textures();
+		std::vector<Texture> &textures() const;
+		std::map<std::string, GLuint> &uids() const;
+		std::map<std::string, GLuint> &aids() const;
 		void incRef();
 		void decRef();
 
 		std::vector<Shader> shaders;
-		std::map<std::string, GLuint> uids;
-		std::map<std::string, GLuint> aids;
+		static std::map<GLuint, std::map<std::string, GLuint>> _uids;
+		static std::map<GLuint, std::map<std::string, GLuint>> _aids;
 		static std::map<GLuint, std::vector<Texture>> gtextures;
 		static std::map<GLuint, unsigned> refCount;
-		static GLuint currentProgram;
 	friend class Uniform;
 };
 
-template<typename ...S>
-ShaderProgram::ShaderProgram(S const&...s) : shaders({s...}) {
-	GLint Result = GL_FALSE;
-	int InfoLogLength;
+class Uniform {
+	public:
+		template<typename T>
+		Uniform &operator=(T const &val) {
+			program.setUniform(id, val);
+			return *this;
+		}
+		template<typename T>
+		Uniform &operator=(T &&val) {
+			program.setUniform(id, val);
+			return *this;
+		}
 
-	// Link the program
-	std::cout << "Linking program" << std::endl;
-	this->id = glCreateProgram();
-	for(auto i = shaders.begin(); i != shaders.end(); ++i)
-		glAttachShader(this->id, i->id);
-	glLinkProgram(this->id);
-
-	// Check the program
-	glGetProgramiv(this->id, GL_LINK_STATUS, &Result);
-	if(Result == GL_FALSE) {
-			glGetProgramiv(this->id, GL_INFO_LOG_LENGTH, &InfoLogLength);
-			std::string ProgramErrorMessage;
-			ProgramErrorMessage.resize(std::max(InfoLogLength, int(1)));
-			glGetProgramInfoLog(this->id, InfoLogLength, NULL, &ProgramErrorMessage[0]);
-
-			throw std::runtime_error(ProgramErrorMessage);
-	}
-
-	incRef();
-	ShaderProgram::gtextures.insert(std::pair<GLuint, std::vector<Texture>>(this->id, std::vector<Texture>()));
-}
-
+		std::string getName();
+		GLenum getType();
+		GLint getSize();
+	protected:
+		Uniform(ShaderProgram const &program, GLuint id);
+		ShaderProgram const &program;
+		GLuint id;
+	friend class ShaderProgram;
+};
 
 #endif

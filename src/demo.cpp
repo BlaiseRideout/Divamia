@@ -9,7 +9,7 @@
 void Demo::init(int argc, char **argv) {
   this->window.makeCurrent();
 
-  this->p = ShaderProgram(FragmentShader("res/screen.frag"), VertexShader("res/screen.vert"));
+  this->p = ShaderProgram({FragmentShader("res/screen.frag"), VertexShader("res/screen.vert")});
 
   this->p["P"] = glm::perspective(45.0f, (float)this->window.width / (float)this->window.height, 0.1f, 1000.0f);
   //this->p["V"] = c.viewMatrix();
