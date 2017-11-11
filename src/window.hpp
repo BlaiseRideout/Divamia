@@ -24,6 +24,7 @@ class Window {
     void clearColor(glm::vec3 color);
     void clearColor(glm::vec4 color);
     void clearScreen();
+    void setViewport();
     void swapBuffers();
     void makeCurrent();
     bool shouldClose();

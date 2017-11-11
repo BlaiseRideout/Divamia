@@ -75,9 +75,16 @@ void Window::clearColor(glm::vec3 color) {
 }
 
 void Window::clearScreen() {
-  glfwMakeContextCurrent(this->window);
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  glfwMakeContextCurrent(Window::currentWindow);
+	if(currentWindow != this->window)
+		glfwMakeContextCurrent(this->window);
+	setViewport();
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	if(currentWindow != this->window)
+		glfwMakeContextCurrent(Window::currentWindow);
+}
+
+void Window::setViewport() {
+	glViewport(0, 0, width, height);
 }
 
 void Window::swapBuffers() {
