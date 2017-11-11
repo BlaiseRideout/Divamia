@@ -15,10 +15,9 @@ class Demo : public Game {
 		Demo();
 		virtual ~Demo();
 	protected:
+		virtual void init(int argc, char **argv);
 		virtual void update();
 		virtual void draw();
-	private:
-		void initGraphics();
 
 		Texture t;
 		ShaderProgram p;

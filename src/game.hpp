@@ -7,16 +7,17 @@
 
 
 class Game {
-    public:
-        Game();
-        virtual ~Game();
-        void run();
-    protected:
-        virtual void update() = 0;
-        virtual void draw() = 0;
+	public:
+		Game();
+		virtual ~Game();
+		void run(int argc, char **argv);
+	protected:
+		virtual void init(int argc, char **argv) = 0;
+		virtual void update() = 0;
+		virtual void draw() = 0;
 
-        Window window;
-        bool running;
+	Window window;
+	bool running;
 };
 
 #endif

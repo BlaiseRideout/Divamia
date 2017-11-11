@@ -6,16 +6,10 @@
 #include <iostream>
 
 
-Demo::Demo() : Game() {
-  initGraphics();
-}
-
-void Demo::initGraphics() {
+void Demo::init(int argc, char **argv) {
   this->window.makeCurrent();
-  FragmentShader f("res/screen.frag");
-  VertexShader v("res/screen.vert");
 
-  this->p = ShaderProgram(f, v);
+  this->p = ShaderProgram(FragmentShader("res/screen.frag"), VertexShader("res/screen.vert"));
 
   this->p["P"] = glm::perspective(45.0f, (float)this->window.width / (float)this->window.height, 0.1f, 1000.0f);
   //this->p["V"] = c.viewMatrix();
@@ -25,9 +19,6 @@ void Demo::initGraphics() {
   this->p["tex"] = t;
 
   this->m = Model("res/cube.obj", this->p, "vertexPosition", "vertexNormal", "vertexUV");*/
-}
-
-Demo::~Demo() {
 }
 
 void Demo::update() {
