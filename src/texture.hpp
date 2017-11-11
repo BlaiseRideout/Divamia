@@ -10,9 +10,10 @@
 class Texture {
 	public:
 		Texture();
-		Texture(GLint filter);
 		Texture(GLint mag_filter, GLint min_filter);
 		Texture(GLuint id);
+		Texture(GLuint id, GLint mag_filter, GLint min_filter);
+		Texture(unsigned width, unsigned height, GLint mag_filter, GLint min_filter);
 		Texture(Texture const &t);
 		Texture(Texture &&t);
 
@@ -28,10 +29,11 @@ class Texture {
 		Texture &operator=(Texture const &s);
 		Texture &operator=(Texture &&s);
 		Texture &operator=(Image const &i);
-		bool operator==(Texture const &s);
+		bool operator==(const Texture &s);
+		operator GLuint() const;
 
-		unsigned int width();
-		unsigned int height();
+		unsigned int width() const;
+		unsigned int height() const;
 		void bind() const;
 	protected:
 		GLuint id;
@@ -41,7 +43,6 @@ class Texture {
 		static void decRef(GLuint id);
 		static void incRef(GLuint id);
 
-		static GLuint currentTexture;
 		static std::map<GLuint, unsigned int> refCount;
 };
 

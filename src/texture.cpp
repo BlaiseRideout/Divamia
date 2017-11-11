@@ -5,31 +5,11 @@
 #include <stdexcept>
 #include <iostream>
 
-unsigned int Texture::width() {
-	glBindTexture(GL_TEXTURE_2D, this->id);
-	GLint width;
-	glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &width);
-	glBindTexture(GL_TEXTURE_2D, Texture::currentTexture);
-	return width;
-}
-
-unsigned int Texture::height() {
-	glBindTexture(GL_TEXTURE_2D, this->id);
-	GLint height;
-	glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &height);
-	glBindTexture(GL_TEXTURE_2D, Texture::currentTexture);
-	return height;
-}
-
 void Texture::bind() const {
-	Texture::currentTexture = this->id;
-	glBindTexture(GL_TEXTURE_2D, Texture::currentTexture);
+	glBindTexture(GL_TEXTURE_2D, id);
 }
 
 Texture::Texture() : id(0), mag_filter(GL_LINEAR), min_filter(GL_LINEAR) {
-}
-
-Texture::Texture(GLint filter) : id(0), mag_filter(filter), min_filter(filter) {
 }
 
 Texture::Texture(GLint mag_filter, GLint min_filter) : id(0), mag_filter(mag_filter), min_filter(min_filter) {
@@ -37,6 +17,15 @@ Texture::Texture(GLint mag_filter, GLint min_filter) : id(0), mag_filter(mag_fil
 
 Texture::Texture(GLuint id) : id(id), mag_filter(GL_LINEAR), min_filter(GL_LINEAR) {
 	incRef(this->id);
+}
+
+Texture::Texture(GLuint id, GLint mag_filter, GLint min_filter) : id(id), mag_filter(mag_filter), min_filter(min_filter) {
+	incRef(this->id);
+
+	glBindTexture(GL_TEXTURE_2D, this->id);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, mag_filter);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, min_filter);
 }
 
 Texture::Texture(Texture const &t) : id(t.id), mag_filter(t.mag_filter), min_filter(t.min_filter) {
@@ -74,8 +63,18 @@ Texture::Texture(Image const &img, GLint mag_filter, GLint min_filter) : mag_fil
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, mag_filter);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, min_filter);
+}
 
-	glBindTexture(GL_TEXTURE_2D, Texture::currentTexture);
+Texture::Texture(unsigned width, unsigned height, GLint mag_filter, GLint min_filter) : mag_filter(mag_filter), min_filter(min_filter) {
+	glGenTextures(1, &this->id);
+	incRef(this->id);
+
+	glBindTexture(GL_TEXTURE_2D, this->id);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, mag_filter);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, min_filter);
 }
 
 Texture::~Texture() {
@@ -85,12 +84,16 @@ Texture::~Texture() {
 Texture &Texture::operator=(Texture const &s) {
 	decRef(this->id);
 	this->id = s.id;
+	min_filter = s.min_filter;
+	mag_filter = s.mag_filter;
 	incRef(this->id);
 	return *this;
 }
 
 Texture &Texture::operator=(Texture &&s) {
 	std::swap(s.id, this->id);
+	std::swap(s.min_filter, s.min_filter);
+	std::swap(s.mag_filter, s.mag_filter);
 	return *this;
 }
 
@@ -106,13 +109,29 @@ Texture &Texture::operator=(Image const &img) {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, mag_filter);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, min_filter);
 
-	glBindTexture(GL_TEXTURE_2D, Texture::currentTexture);
-
 	return *this;
 }
 
 bool Texture::operator==(const Texture &s) {
 	return this->id == s.id;
+}
+
+Texture::operator GLuint() const {
+	return id;
+}
+
+unsigned int Texture::width() const {
+	glBindTexture(GL_TEXTURE_2D, this->id);
+	GLint width;
+	glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &width);
+	return width;
+}
+
+unsigned int Texture::height() const {
+	glBindTexture(GL_TEXTURE_2D, this->id);
+	GLint height;
+	glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &height);
+	return height;
 }
 
 void Texture::decRef(GLuint id) {
@@ -137,5 +156,4 @@ void Texture::incRef(GLuint id) {
 		Texture::refCount.insert(std::make_pair<GLuint, unsigned int>(std::move(id), 1));
 }
 
-GLuint Texture::currentTexture;
 std::map<GLuint, unsigned int> Texture::refCount;
