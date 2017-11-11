@@ -1,4 +1,6 @@
-makefile
-obj/
-*.o
-divamia
+CMakeCache.txt
+CMakeFiles/
+CMakeLists.txt
+Makefile
+cmake_install.cmake
+demo

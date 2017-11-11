@@ -11,9 +11,6 @@
 
 
 class Demo : public Game {
-	public:
-		Demo();
-		virtual ~Demo();
 	protected:
 		virtual void init(int argc, char **argv);
 		virtual void update();
