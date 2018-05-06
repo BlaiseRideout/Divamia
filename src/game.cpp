@@ -1,6 +1,5 @@
 #include "game.hpp"
 
-
 Game::Game() : window(800, 600, false, 3, 0), running(true) {
 }
 
@@ -9,7 +8,7 @@ Game::~Game() {
 }
 
 void Game::run(int argc, char **argv) {
-	init(argc, argv);
+  init(argc, argv);
   while(this->running && !this->window.shouldClose()) {
     update();
     draw();

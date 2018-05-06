@@ -70,7 +70,7 @@ void Buffer::unbind() const {
     unbind(this->target);
 }
 
-void Buffer::setAttrib(GLuint attribute, int size, GLenum type, bool normalized, int divisor) const {
+void Buffer::setAttrib(GLuint attribute, int divisor, bool normalized, GLenum type) const {
     glEnableVertexAttribArray(attribute);
     this->bind();
     glVertexAttribPointer(
@@ -81,54 +81,18 @@ void Buffer::setAttrib(GLuint attribute, int size, GLenum type, bool normalized,
         0,                                // stride
         (void*)0                          // array buffer offset
     );
-		if(divisor > 0)
-			glVertexAttribDivisor(attribute, divisor);
+    if(divisor > 0)
+      glVertexAttribDivisor(attribute, divisor);
 }
 
-void Buffer::setAttrib(GLuint attribute, int size, GLenum type, bool normalized) const {
-    setAttrib(attribute, size, type, normalized, 0);
+void Buffer::setAttrib(const ShaderProgram &s, const std::string& name, int divisor, bool normalized, GLenum type) const {
+    setAttrib(s, name.c_str(), divisor, normalized, type);
 }
 
-void Buffer::setAttrib(GLuint attribute, int size, bool normalized) const {
-    setAttrib(attribute, size, GL_FLOAT, normalized);
+void Buffer::setAttrib(const ShaderProgram &s, const char *name, int divisor, bool normalized, GLenum type) const {
+    setAttrib(s.getAttribLocation(name), divisor, normalized, type);
 }
 
-void Buffer::setAttrib(GLuint attribute, int size) const {
-    setAttrib(attribute, size, GL_FLOAT, false);
-}
-
-void Buffer::setAttrib(ShaderProgram &s, std::string name, int size, GLenum type, bool normalized, int divisor) const {
-    setAttrib(s.getAttribLocation(name), size, type, normalized, divisor);
-}
-
-void Buffer::setAttrib(ShaderProgram &s, std::string name, int size, GLenum type, bool normalized) const {
-    setAttrib(s.getAttribLocation(name), size, type, normalized);
-}
-
-void Buffer::setAttrib(ShaderProgram &s, std::string name, int size, bool normalized) const {
-    setAttrib(s, name, size, GL_FLOAT, normalized);
-}
-
-void Buffer::setAttrib(ShaderProgram &s, std::string name, int size) const {
-    setAttrib(s, name, size, GL_FLOAT, false);
-}
-
-
-void Buffer::setAttrib(ShaderProgram &&s, std::string name, int size, GLenum type, bool normalized, int divisor) const {
-    setAttrib(s.getAttribLocation(name), size, type, normalized, divisor);
-}
-
-void Buffer::setAttrib(ShaderProgram &&s, std::string name, int size, GLenum type, bool normalized) const {
-    setAttrib(s.getAttribLocation(name), size, type, normalized);
-}
-
-void Buffer::setAttrib(ShaderProgram &&s, std::string name, int size, bool normalized) const {
-    setAttrib(s, name, size, GL_FLOAT, normalized);
-}
-
-void Buffer::setAttrib(ShaderProgram &&s, std::string name, int size) const {
-    setAttrib(s, name, size, GL_FLOAT, false);
-}
 
 void Buffer::drawArrays() {
     drawArrays(GL_TRIANGLES);

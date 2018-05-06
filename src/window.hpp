@@ -1,24 +1,18 @@
 #ifndef GRAPHICS_H
 #define GRAPHICS_H
 
-#include <GL/glew.h>
+#include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <string>
 #include <map>
 
-
 class Window {
   public:
-    Window(int width, int height, bool fullscreen, std::string title, int majorVersion, int minorVersion);
-    Window(int width, int height, bool fullscreen, std::string title);
-    Window(int width, int height, bool fullscreen, int majorVersion, int minorVersion);
-    Window(int width, int height, bool fullscreen);
-    Window(bool fullscreen);
-    Window(int width, int height);
+    Window(int width = 800, int height = 600, bool fullscreen = false, int majorVersion = 2, int minorVersion = 1, const std::string& title = "Divamia");
     Window(Window const &w);
+    Window(Window &&w) = default;
     Window(GLFWwindow *window);
-    Window();
     virtual ~Window();
     operator GLFWwindow*() const;
     void clearColor(glm::vec3 color);
@@ -41,6 +35,7 @@ class Window {
     void initGL();
     void initGlfw();
 
+  bool initialized = false;
     GLFWwindow *window;
     static std::map<GLFWwindow*, unsigned> refCount;
     static GLFWwindow *currentWindow;

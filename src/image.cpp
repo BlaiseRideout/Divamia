@@ -1,65 +1,96 @@
-#include <FreeImage.h>
-#include <stdexcept>
-#include <string.h>
-
-#include <iostream>
-
 #include "image.hpp"
 
-Image::Image() : width(0), height(0) {
+#include <cassert>
+#include <stdexcept>
+#include <string.h>
+#include <iostream>
+#include <unordered_map>
+#include <array>
+
+static constexpr size_t BITS_PER_BYTE = 8;
+
+static const std::unordered_map<unsigned, std::array<unsigned, 3>> masks{
+  {32, {0xFF0000, 0x00FF00, 0x0000FF} },
+  {24, {0xFF0000, 0x00FF00, 0x0000FF} },
+};
+
+Image::Image(const char *name) {
+  loadFile(name);
 }
 
-Image::Image(std::string name) {
-	this->loadFile(name);
+Image::Image(const std::string& name) : Image(name.c_str()) {
 }
 
-Image::Image(unsigned width, unsigned height, unsigned char *temppix) : width(width), height(height), pix(temppix, temppix + width * height * 4) {
+Image::Image(unsigned width, unsigned height, std::vector<unsigned char> pix) {
+  loadData(width, height, std::move(pix));
 }
 
-Image::Image(unsigned width, unsigned height, std::vector<unsigned char> pix) : width(width), height(height), pix(pix) {
+Image::Image(unsigned width, unsigned height, unsigned char *temppix, unsigned bpp)  : Image(width, height, std::vector<unsigned char>(temppix, temppix + width * height * bpp / BITS_PER_BYTE)) {
 }
 
-Image::Image(unsigned width, unsigned height) : Image(width, height, std::vector<unsigned char>(width * height * 4)) {
+Image::Image(unsigned width, unsigned height, unsigned bpp) : Image(width, height, std::vector<unsigned char>(width * height * bpp / BITS_PER_BYTE)) {
 }
 
-Image::Image(Image const &i) : Image(i.width, i.height, i.pix) {
+Image::~Image() {
+  if(_freeImage != nullptr)
+    FreeImage_Unload(_freeImage);
+  _freeImage = nullptr;
 }
 
-Image::Image(Image &&i) : width(i.width), height(i.height), pix(i.pix) {
-	std::swap(width, i.width);
-	std::swap(height, i.height);
-	std::swap(pix, i.pix);
+void Image::loadData(unsigned width, unsigned height, std::vector<unsigned char> pix) {
+  _width = width;
+  _pitch = width;
+  _height = height;
+  _pix = std::move(pix);
+  _bpp = _pix.size() / _width / _height * BITS_PER_BYTE;
+
+  assert(masks.find(_bpp) != masks.end());
+
+  if(_freeImage != nullptr)
+    FreeImage_Unload(_freeImage);
+
+  _freeImage = FreeImage_ConvertFromRawBits(
+    _pix.data(),
+    _width,
+    _height,
+    _pitch,
+    _bpp,
+    masks.at(_bpp)[0], // Red mask
+    masks.at(_bpp)[1], // Green mask
+    masks.at(_bpp)[2]  // Blue mask
+  );
 }
 
-Image &Image::operator=(Image const &i) {
-	width = i.width;
-	height = i.height;
-	pix = i.pix;
-	return *this;
+void Image::loadData(unsigned width, unsigned height, unsigned char *pix, unsigned bpp) {
+  loadData(width, height, std::vector<unsigned char>(width * height * bpp / BITS_PER_BYTE));
 }
 
-Image &Image::operator=(Image &&i) {
-	std::swap(this->width, i.width);
-	std::swap(this->height, i.height);
-	std::swap(this->pix, i.pix);
-	return *this;
+void Image::loadFile(const std::string& filename) {
+  loadFile(filename.c_str());
 }
 
-void Image::loadFile(std::string filename) {
-	FREE_IMAGE_FORMAT format = FreeImage_GetFileType(filename.c_str(), 0);
-	FIBITMAP* imagen = FreeImage_Load(format, filename.c_str());
+void Image::loadFile(const char *filename) {
+  if(_freeImage != nullptr)
+    FreeImage_Unload(_freeImage);
 
-	FIBITMAP* temp = imagen;
-	imagen = FreeImage_ConvertTo32Bits(imagen);
-	FreeImage_Unload(temp);
+  FREE_IMAGE_FORMAT format = FreeImage_GetFileType(filename, 0);
+  _freeImage = FreeImage_Load(format, filename);
 
-	width = FreeImage_GetWidth(imagen);
-	height = FreeImage_GetHeight(imagen);
-	if(width == 0 || height == 0)
-		throw std::runtime_error("Couldn't load image: " + filename);
+  _bpp = FreeImage_GetBPP(_freeImage);
+  _pitch = FreeImage_GetPitch(_freeImage);
+  _width = FreeImage_GetWidth(_freeImage);
+  _height = FreeImage_GetHeight(_freeImage);
 
-	unsigned char *temppix = FreeImage_GetBits(imagen);
-	this->pix = std::vector<unsigned char>(temppix, temppix + width * height * 4);
+  if (_width == 0 || _height == 0) {
+    std::string message("Couldn't load image: ");
+    message += filename;
+    throw std::runtime_error(message);
+  }
 
-	FreeImage_Unload(imagen);
+  unsigned char *temppix = FreeImage_GetBits(_freeImage);
+  _pix = std::vector<unsigned char>(temppix, temppix + _pitch * _height * _bpp / BITS_PER_BYTE);
+}
+
+void Image::convertFormat(const size_t newBytesPerPixel) {
+  assert(false);
 }

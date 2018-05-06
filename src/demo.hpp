@@ -9,20 +9,15 @@
 #include "vao.hpp"
 #include "model.hpp"
 
-
 class Demo : public Game {
-	protected:
-		virtual void init(int argc, char **argv);
-		virtual void update();
-		virtual void draw();
+  protected:
+    virtual void init(int argc, char **argv);
+    virtual void update();
+    virtual void draw();
 
-		Texture t;
-		ShaderProgram p;
-		//Buffer inds;
-		//VAO vao;
-		//Model m;
-		//FPCamera c;
-
+    ShaderProgram p;
+    Buffer verts;
+    Buffer colors;
 };
 
 

@@ -1,5 +1,11 @@
 CMakeCache.txt
 CMakeFiles/
-Makefile
+.vs/
+.vscode/
+Debug/
+Release/
+RelWithDebInfo/
+build/
 cmake_install.cmake
-demo
+Makefile
+divamia
