@@ -20,13 +20,16 @@ class Texture {
     Texture(const std::string& name, GLint filter = GL_NEAREST);
     Texture(const std::string& name, GLint mag_filter, GLint min_filter);
 
-    Texture(Image const &img, GLint filter = GL_NEAREST);
-    Texture(Image const &img, GLint mag_filter, GLint min_filter);
+    Texture(Image &img, GLint filter = GL_NEAREST);
+    Texture(Image &img, GLint mag_filter, GLint min_filter);
+    Texture(Image &&img, GLint filter = GL_NEAREST);
+    Texture(Image &&img, GLint mag_filter, GLint min_filter);
 
     virtual ~Texture();
     Texture &operator=(Texture const &s);
     Texture &operator=(Texture &&s) = default;
-    Texture &operator=(Image const &i);
+    Texture &operator=(Image &i);
+    Texture &operator=(Image &&i);
     bool operator==(const Texture &s);
     operator GLuint() const;
 

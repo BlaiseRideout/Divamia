@@ -28,10 +28,14 @@ Texture::Texture(const std::string& filename, GLint filter) : Texture(filename.c
 Texture::Texture(const std::string& filename, GLint mag_filter, GLint min_filter) : Texture(filename.c_str(), mag_filter, min_filter) {
 }
 
-Texture::Texture(Image const &img, GLint filter) : Texture(img, filter, filter) {
+Texture::Texture(Image &img, GLint filter) : Texture(img, filter, filter) {
 }
 
-Texture::Texture(Image const &img, GLint mag_filter, GLint min_filter) : mag_filter(mag_filter), min_filter(min_filter) {
+Texture::Texture(Image &&img, GLint filter) : Texture(img, filter) {
+}
+
+Texture::Texture(Image &img, GLint mag_filter, GLint min_filter) : mag_filter(mag_filter), min_filter(min_filter) {
+  img.convertFormat(32);
   glGenTextures(1, &this->id);
   incRef(this->id);
 
@@ -41,6 +45,9 @@ Texture::Texture(Image const &img, GLint mag_filter, GLint min_filter) : mag_fil
 
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, mag_filter);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, min_filter);
+}
+
+Texture::Texture(Image &&img, GLint mag_filter, GLint min_filter) : Texture(img, mag_filter, min_filter) {
 }
 
 Texture::Texture(unsigned width, unsigned height, GLint mag_filter, GLint min_filter) : mag_filter(mag_filter), min_filter(min_filter) {
@@ -68,7 +75,8 @@ Texture &Texture::operator=(Texture const &s) {
   return *this;
 }
 
-Texture &Texture::operator=(Image const &img) {
+Texture &Texture::operator=(Image &img) {
+  img.convertFormat(32);
   if(!this->id) {
     glGenTextures(1, &this->id);
     incRef(this->id);
@@ -80,6 +88,11 @@ Texture &Texture::operator=(Image const &img) {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, mag_filter);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, min_filter);
 
+  return *this;
+}
+
+Texture &Texture::operator=(Image &&img) {
+  *this = img;
   return *this;
 }
 

@@ -28,7 +28,6 @@ class Shader {
 
     Shader &operator=(Shader const &s);
     Shader &operator=(Shader &&s);
-    operator GLuint() const { return id; }
   protected:
     virtual void load(std::string const &filename);
     std::string loadCode(std::string const &filename);
@@ -84,7 +83,6 @@ class ShaderProgram {
 
     ShaderProgram &operator=(ShaderProgram const &s);
     ShaderProgram &operator=(ShaderProgram &&s);
-    operator GLuint() const;
 
     void setUniform(GLuint name, int value) const;
     void setUniform(GLuint name, unsigned int value) const;

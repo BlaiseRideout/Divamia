@@ -56,8 +56,9 @@ target_include_directories(${PROJECT_NAME} PRIVATE "${GLM_DIR}")
 #############
 # FreeImage #
 #############
-set(FREEIMAGE_DIR "${THIRDPARTY}/FreeImage")
-add_subdirectory("${FREEIMAGE_DIR}")
-target_link_libraries(${PROJECT_NAME} ${XMAKE_FREEIMAGE_LINK_TARGETS})
-target_include_directories(${PROJECT_NAME} PRIVATE ${XMAKE_FREEIMAGE_INCLUDE_PATHS})
-target_compile_definitions(${PROJECT_NAME} PRIVATE ${XMAKE_FREEIMAGE_COMPILE_DEFINITIONS})
+target_link_libraries(${PROJECT_NAME} freeimage)
+#set(FREEIMAGE_DIR "${THIRDPARTY}/freeimage")
+#add_subdirectory("${FREEIMAGE_DIR}")
+#target_link_libraries(${PROJECT_NAME} ${XMAKE_FREEIMAGE_LINK_TARGETS})
+#target_include_directories(${PROJECT_NAME} PRIVATE ${XMAKE_FREEIMAGE_INCLUDE_PATHS})
+#target_compile_definitions(${PROJECT_NAME} PRIVATE ${XMAKE_FREEIMAGE_COMPILE_DEFINITIONS})

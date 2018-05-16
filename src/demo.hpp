@@ -6,8 +6,6 @@
 #include "texture.hpp"
 #include "camera.hpp"
 #include "buffer.hpp"
-#include "vao.hpp"
-#include "model.hpp"
 
 class Demo : public Game {
   protected:
@@ -15,9 +13,18 @@ class Demo : public Game {
     virtual void update();
     virtual void draw();
 
-    ShaderProgram p;
-    Buffer verts;
-    Buffer colors;
+    void initTriangle();
+    void initTexture();
+
+    ShaderProgram triangle;
+
+    ShaderProgram texture;
+
+    Buffer triangleVerts;
+    Buffer triangleColors;
+
+    Buffer textureVerts;
+    Buffer textureUVs;
 };
 
 

@@ -26,11 +26,10 @@ class Image {
 
     unsigned width() const { return _width; }
     unsigned height() const { return _height;  }
-    unsigned pitch() const { return _pitch;  }
     unsigned bpp() const { return _bpp;  }
     const std::vector<unsigned char> &data() const { return _pix; }
   protected:
     FIBITMAP *_freeImage = nullptr;
-    unsigned _width = 0, _height = 0, _bpp = 32, _pitch = _width;
+    unsigned _width = 0, _height = 0, _bpp = 32;
     std::vector<unsigned char> _pix;
 };

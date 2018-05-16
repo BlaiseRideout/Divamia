@@ -200,10 +200,6 @@ ShaderProgram &ShaderProgram::operator=(ShaderProgram &&s) {
   return *this;
 }
 
-ShaderProgram::operator GLuint() const {
-  return this->id;
-}
-
 void ShaderProgram::setUniform(GLuint name, int value) const {
     glUseProgram(this->id);
     glUniform1i(name, value);
@@ -307,12 +303,7 @@ std::vector<Texture> &ShaderProgram::textures() const {
   if(this->id == 0)
     throw std::runtime_error("Error: Shader program not loaded yet");
 
-  auto i = gtextures.find(this->id);
-  if(i == gtextures.end()) {
-    i = gtextures.insert(gtextures.end(), std::pair<GLuint, std::vector<Texture>>(this->id, std::vector<Texture>()));
-  }
-
-  return i->second;
+  return gtextures[id];
 }
 
 std::map<std::string, GLuint> &ShaderProgram::uids() const {
@@ -366,7 +357,7 @@ std::string Uniform::getName() {
     GLint size;
     GLenum type;
     GLchar name[256];
-    glGetActiveUniform(program, id, 255, NULL, &size, &type, name);
+    glGetActiveUniform(program.id, id, 255, NULL, &size, &type, name);
     return std::string(name);
 }
 
@@ -374,7 +365,7 @@ GLenum Uniform::getType() {
     GLint size;
     GLenum type;
     GLchar name;
-    glGetActiveUniform(program, id, 0, NULL, &size, &type, &name);
+    glGetActiveUniform(program.id, id, 0, NULL, &size, &type, &name);
     return type;
 }
 
@@ -382,7 +373,7 @@ GLint Uniform::getSize() {
     GLint size;
     GLenum type;
     GLchar name;
-    glGetActiveUniform(program, id, 0, NULL, &size, &type, &name);
+    glGetActiveUniform(program.id, id, 0, NULL, &size, &type, &name);
     return size;
 }
 

@@ -8,7 +8,7 @@ Buffer::Buffer(GLenum target) : id(0), size(0), target(target) {
 
 }
 
-Buffer::Buffer(Buffer const &b) : id(b.id), size(b.size), target(b.target) {
+Buffer::Buffer(Buffer const &b) : id(b.id), size(b.size), target(b.target), _elemSize(b._elemSize) {
     auto iterid = Buffer::refCount.find(this->id);
     if(iterid != Buffer::refCount.end())
         iterid->second = iterid->second + 1;
@@ -37,6 +37,7 @@ Buffer &Buffer::operator=(Buffer const &b) {
     this->id = b.id;
     this->size = b.size;
     this->target = b.target;
+    this->_elemSize = b._elemSize;
     iterid = Buffer::refCount.find(this->id);
     if(iterid != Buffer::refCount.end())
         iterid->second = iterid->second + 1;
@@ -47,11 +48,32 @@ Buffer &Buffer::operator=(Buffer &&b) {
     std::swap(this->id, b.id);
     std::swap(this->size, b.size);
     std::swap(this->target, b.target);
+    std::swap(this->_elemSize, b._elemSize);
     return *this;
 }
 
 Buffer::operator GLuint() {
     return this->id;
+}
+
+
+void Buffer::setElemSize(int elemSize) {
+  _elemSize = elemSize;
+}
+
+template<>
+void Buffer::setElemSize<glm::vec3>() {
+  setElemSize(3);
+}
+
+template<>
+void Buffer::setElemSize<glm::vec2>() {
+  setElemSize(2);
+}
+
+template<>
+void Buffer::setElemSize<float>() {
+  setElemSize(1);
 }
 
 void Buffer::bind(GLenum target) const {
@@ -70,12 +92,12 @@ void Buffer::unbind() const {
     unbind(this->target);
 }
 
-void Buffer::setAttrib(GLuint attribute, int divisor, bool normalized, GLenum type) const {
+void Buffer::setAttrib(GLuint attribute,                                bool normalized, int divisor, GLenum type) const {
     glEnableVertexAttribArray(attribute);
     this->bind();
     glVertexAttribPointer(
         attribute,
-        size,
+        _elemSize,
         type,
         normalized?GL_TRUE:GL_FALSE,
         0,                                // stride
@@ -85,29 +107,17 @@ void Buffer::setAttrib(GLuint attribute, int divisor, bool normalized, GLenum ty
       glVertexAttribDivisor(attribute, divisor);
 }
 
-void Buffer::setAttrib(const ShaderProgram &s, const std::string& name, int divisor, bool normalized, GLenum type) const {
-    setAttrib(s, name.c_str(), divisor, normalized, type);
+void Buffer::setAttrib(const ShaderProgram &s, const std::string& name, bool normalized, int divisor, GLenum type) const {
+    setAttrib(s, name.c_str(), normalized, divisor, type);
 }
 
-void Buffer::setAttrib(const ShaderProgram &s, const char *name, int divisor, bool normalized, GLenum type) const {
-    setAttrib(s.getAttribLocation(name), divisor, normalized, type);
+void Buffer::setAttrib(const ShaderProgram &s, const char *name,        bool normalized, int divisor, GLenum type) const {
+    setAttrib(s.getAttribLocation(name), normalized, divisor, type);
 }
 
-
-void Buffer::drawArrays() {
-    drawArrays(GL_TRIANGLES);
-}
 
 void Buffer::drawArrays(GLenum mode) {
     glDrawArrays(mode, 0, this->size);
-}
-
-void Buffer::drawElements() {
-    drawElements(GL_TRIANGLES, GL_UNSIGNED_INT);
-}
-
-void Buffer::drawElements(GLenum mode) {
-    drawElements(mode, GL_UNSIGNED_INT);
 }
 
 void Buffer::drawElements(GLenum mode, GLenum type) {
