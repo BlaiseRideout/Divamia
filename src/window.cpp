@@ -1,28 +1,38 @@
 #include "window.hpp"
 
-#include <stdlib.h>
+#include <glm/gtc/matrix_transform.hpp>
 #include <iostream>
 #include <stdexcept>
-#include <glm/gtc/matrix_transform.hpp>
+#include <stdlib.h>
 
-Window::Window(int width, int height, bool fullscreen, int majorVersion, int minorVersion, const std::string& title) : width(width), height(height), fullscreen(fullscreen), title(title), majorVersion(majorVersion), minorVersion(minorVersion) {
+Window::Window(int width,
+               int height,
+               bool fullscreen,
+               int majorVersion,
+               int minorVersion,
+               const std::string &title) :
+    width(width),
+    height(height),
+    fullscreen(fullscreen),
+    title(title),
+    majorVersion(majorVersion),
+    minorVersion(minorVersion) {
   initGlfw();
-  Window::refCount.insert(std::pair<GLFWwindow*, unsigned>(this->window, 1));
+  Window::refCount.insert(std::pair<GLFWwindow *, unsigned>(this->window, 1));
   initGL();
 }
 
 Window::Window(Window const &w) :
-  width(w.width),
-  height(w.height),
-  fullscreen(w.fullscreen),
-  title(w.title),
-  majorVersion(w.majorVersion),
-  minorVersion(w.minorVersion),
-  window(w.window),
-  initialized(w.initialized) {
+    width(w.width),
+    height(w.height),
+    fullscreen(w.fullscreen),
+    title(w.title),
+    majorVersion(w.majorVersion),
+    minorVersion(w.minorVersion),
+    window(w.window),
+    initialized(w.initialized) {
   auto iterid = Window::refCount.find(this->window);
-  if(iterid != Window::refCount.end())
-      iterid->second = iterid->second + 1;
+  if(iterid != Window::refCount.end()) iterid->second = iterid->second + 1;
 }
 
 Window::Window(GLFWwindow *window) : window(window) {
@@ -33,19 +43,18 @@ Window::Window(GLFWwindow *window) : window(window) {
 
 Window::~Window() {
   auto iterid = Window::refCount.find(this->window);
-  if (iterid != Window::refCount.end()) {
+  if(iterid != Window::refCount.end()) {
     iterid->second = iterid->second - 1;
-    if (iterid->second == 0) {
-      if (Window::currentWindow == window)
-        Window::currentWindow = nullptr;
+    if(iterid->second == 0) {
+      if(Window::currentWindow == window) Window::currentWindow = nullptr;
       glfwDestroyWindow(window);
     }
   }
-  else if (window != nullptr)
+  else if(window != nullptr)
     glfwDestroyWindow(window);
 }
 
-Window::operator GLFWwindow*() const {
+Window::operator GLFWwindow *() const {
   return this->window;
 }
 
@@ -60,12 +69,10 @@ void Window::clearColor(glm::vec3 color) {
 }
 
 void Window::clearScreen() {
-  if(currentWindow != this->window)
-    glfwMakeContextCurrent(this->window);
+  if(currentWindow != this->window) glfwMakeContextCurrent(this->window);
   setViewport();
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  if(currentWindow != this->window)
-    glfwMakeContextCurrent(Window::currentWindow);
+  if(currentWindow != this->window) glfwMakeContextCurrent(Window::currentWindow);
 }
 
 void Window::setViewport() {
@@ -86,7 +93,7 @@ bool Window::shouldClose() {
 }
 
 void Window::shouldClose(bool should) {
-  glfwSetWindowShouldClose(this->window, should?GL_TRUE:GL_FALSE);
+  glfwSetWindowShouldClose(this->window, should ? GL_TRUE : GL_FALSE);
 }
 
 int Window::getKey(int key) const {
@@ -112,8 +119,7 @@ void Window::initGlfw() {
   assert(!initialized);
 
   // Initialize glfw
-  if (!glfwInit())
-    throw std::runtime_error("Failed to initialize GLFW.");
+  if(!glfwInit()) throw std::runtime_error("Failed to initialize GLFW.");
 
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, this->majorVersion);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, this->minorVersion);
@@ -121,23 +127,23 @@ void Window::initGlfw() {
   glfwWindowHint(GLFW_SAMPLES, 4);
 
   if(this->fullscreen)
-    this->window = glfwCreateWindow(this->width, this->height, title.c_str(), glfwGetPrimaryMonitor(), nullptr);
+    this->window = glfwCreateWindow(
+        this->width, this->height, title.c_str(), glfwGetPrimaryMonitor(), nullptr);
   else
     this->window = glfwCreateWindow(this->width, this->height, title.c_str(), nullptr, nullptr);
 
-  if(!this->window)
-    throw std::runtime_error("Failed to open GLFW window.");
+  if(!this->window) throw std::runtime_error("Failed to open GLFW window.");
 
   glfwSwapInterval(static_cast<int>(true));
 
   this->makeCurrent();
 
-  if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+  if(!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
     throw std::runtime_error("Failed to initialize glad");
   }
 
   std::cout << glGetString(GL_VERSION) << std::endl;
 }
 
-std::map<GLFWwindow*, unsigned> Window::refCount;
+std::map<GLFWwindow *, unsigned> Window::refCount;
 GLFWwindow *Window::currentWindow = nullptr;

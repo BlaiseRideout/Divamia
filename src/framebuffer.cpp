@@ -3,10 +3,15 @@
 #include <cassert>
 #include <iostream>
 
-Framebuffer::Framebuffer(unsigned width, unsigned height) : Framebuffer(width, height, GL_COLOR_ATTACHMENT0) {
-}
+Framebuffer::Framebuffer(unsigned width, unsigned height) :
+    Framebuffer(width, height, GL_COLOR_ATTACHMENT0) {}
 
-Framebuffer::Framebuffer(unsigned width, unsigned height, GLint attachment) : tex(width, height, GL_NEAREST, GL_NEAREST), attachment(attachment), width(width), height(height), id(0) {
+Framebuffer::Framebuffer(unsigned width, unsigned height, GLint attachment) :
+    tex(width, height, GL_NEAREST, GL_NEAREST),
+    attachment(attachment),
+    width(width),
+    height(height),
+    id(0) {
   glGenFramebuffers(1, &id);
   glBindTexture(GL_TEXTURE_2D, 0);
 
@@ -16,7 +21,8 @@ Framebuffer::Framebuffer(unsigned width, unsigned height, GLint attachment) : te
 
   assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
 
-  std::cout << "Framebuffer texture: " << tex << "(" << tex.width() << "x" << tex.height() << ")" << std::endl;
+  std::cout << "Framebuffer texture: " << tex << "(" << tex.width() << "x" << tex.height() << ")"
+            << std::endl;
 
   unbind();
 }

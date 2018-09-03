@@ -1,6 +1,6 @@
-#include <stdexcept>
-#include <iostream>
 #include <glm/glm.hpp>
+#include <iostream>
+#include <stdexcept>
 
 #include "demo.hpp"
 

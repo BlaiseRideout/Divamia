@@ -1,7 +1,6 @@
 #include "game.hpp"
 
-Game::Game() : window(800, 600, false, 3, 0), running(true) {
-}
+Game::Game() : window(800, 600, false, 3, 0), running(true) {}
 
 Game::~Game() {
   glfwTerminate();

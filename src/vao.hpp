@@ -5,14 +5,15 @@
 #include "shader.hpp"
 
 class VAO {
-  public:
-    VAO();
+public:
+  VAO();
 
-    void bind();
-    void unbind();
-    operator GLuint();
-  protected:
-    GLuint id;
+  void bind();
+  void unbind();
+  operator GLuint();
+
+protected:
+  GLuint id;
 };
 
 #endif

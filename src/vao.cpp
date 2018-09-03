@@ -2,13 +2,10 @@
 
 #include <iostream>
 
-
-VAO::VAO() : id(0) {
-}
+VAO::VAO() : id(0) {}
 
 void VAO::bind() {
-  if(this->id == 0)
-    glGenVertexArrays(1, &this->id);
+  if(this->id == 0) glGenVertexArrays(1, &this->id);
   glBindVertexArray(this->id);
 }
 
